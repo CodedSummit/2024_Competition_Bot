@@ -201,6 +201,7 @@ public static final class IntakeConstants {
   public static final int kIntakeCanbusID = 0;
   public static double kShooterSpeed = 0.0;
   public static double intakeSpeed;
+  public static int kIntakeBeambreakID = 0; // digital ID for the beam break switch
 }
 
 }

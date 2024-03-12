@@ -7,8 +7,11 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.commands.IntakeNoteCommand;
 
 /**
  * The subsystem responsible for picking up Notes
@@ -22,8 +25,9 @@ import frc.robot.Constants.IntakeConstants;
  */
 public class IntakeSubsystem extends SubsystemBase {
 
-  boolean m_hasNote = false; // is known to be holding a Note
-  CANSparkMax m_motor  = new CANSparkMax(IntakeConstants.kIntakeCanbusID, MotorType.kBrushless);
+  private boolean m_hasNote = false; // is known to be holding a Note
+  private CANSparkMax m_motor  = new CANSparkMax(IntakeConstants.kIntakeCanbusID, MotorType.kBrushless);
+  private DigitalInput m_beamSwitch = new DigitalInput(IntakeConstants.kIntakeBeambreakID);
   // TODO - use the beam break to know a Note is picked up
 
   public IntakeSubsystem() {
@@ -32,7 +36,8 @@ public class IntakeSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-
+    m_hasNote = !m_beamSwitch.get();  // assumes switch "true" means the beam is NOT broken (Thus no Note)
+    // TODO - we could consider lighting up the LED strip if we just picked up a Note
   }
 
   @Override
@@ -62,4 +67,11 @@ public class IntakeSubsystem extends SubsystemBase {
     m_motor.set(0.0);
   }
 
+  /**
+   * Make a command to pickup a Note
+   * @return IntakeNoteCommand
+   */
+  public Command pickupPiece() {
+    return new IntakeNoteCommand(this);
+  }
 }
