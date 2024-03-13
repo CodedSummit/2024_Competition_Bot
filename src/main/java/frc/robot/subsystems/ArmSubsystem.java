@@ -4,15 +4,25 @@
 
 package frc.robot.subsystems;
 
+import java.util.Map;
+
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.IntakeConstants;
 
 /**
  * Models the Arm that is used for putting Notes in the Amp, as well as
@@ -33,11 +43,14 @@ import frc.robot.Constants.ArmConstants;
 public class ArmSubsystem extends ProfiledPIDSubsystem {
 
   // TODO - set real motor type, real encoder type and various constants
-  private final PWMSparkMax m_motor = new PWMSparkMax(ArmConstants.kMotorPort);
+  private final CANSparkMax m_armMotor = new CANSparkMax(ArmConstants.kArmMotorCANbusID, MotorType.kBrushless);  // motor that moves the arm
+  private final CANSparkMax m_armHandlerMotor = new CANSparkMax(ArmConstants.kArmHandlerMotorCANbusID, MotorType.kBrushless); // motor to handle the Note
   private final Encoder m_encoder = new Encoder(ArmConstants.kEncoderPorts[0], ArmConstants.kEncoderPorts[1]);
   private final ArmFeedforward m_feedforward = new ArmFeedforward(
       ArmConstants.kSVolts, ArmConstants.kGVolts,
       ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
+  private double m_handlerSpeed = ArmConstants.kHandlerDefaultSpeed;
+  private GenericEntry nt_handlerSpeed;
 
   /** Creates a new . */
   public ArmSubsystem() {
@@ -70,7 +83,7 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
     // Calculate the feedforward from the sepoint
     double feedforward = m_feedforward.calculate(setpoint.position, setpoint.velocity);
     // Add the feedforward to the PID output to get the motor output
-    m_motor.setVoltage(output + feedforward);
+    m_armMotor.setVoltage(output + feedforward);
   }
 
   @Override
@@ -104,17 +117,54 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
     if ( Math.toDegrees(newGoal) < ArmConstants.kMinArmAngleDeg) newGoal = Math.toRadians(ArmConstants.kMinArmAngleDeg);
     setGoal(newGoal);
   }
+ 
   private void setupShuffleboard() {
     // use Shuffleboard to facilitate controller param tuning
     ShuffleboardTab arm = Shuffleboard.getTab("Arm");
     try {
       arm.add("Arm Control PID", m_controller);
-      arm.add("Arm Control FeedForward", m_feedforward);  // turns out this class doesn't implement Sendable
       
-    } catch (Exception e) {// eat it.  for some reason it fails if the tab exists
+      nt_handlerSpeed = arm.add("Handler speed", 0.0)
+          .withSize(3, 1)
+          .withWidget(BuiltInWidgets.kNumberSlider)
+          .withProperties(Map.of("min", -1, "max", 1))
+          .getEntry();
+      arm.add("Start Handler Forward", new InstantCommand(() -> handlerMotorDriveForward())).withPosition(1, 1);
+      arm.add("Start Handler Reverse", new InstantCommand(() -> handlerMotorDriveBackward())).withPosition(2, 1);
+
+      arm.add("Cancel Handler", new InstantCommand(() -> handlerMotorStop())).withPosition(3, 1);
+    } catch (Exception e) {// eat it. for some reason it fails if the tab exists
     }
   }
 
+  public double getHandlerSpeed() {
+     // TODO - consider only setting up Shuffleboard for the speed in non-competition configuration
+      //  to avoid inadvertent mucking with the speed in a competition
+    m_handlerSpeed = nt_handlerSpeed.getDouble(ArmConstants.kHandlerDefaultSpeed);
+    return m_handlerSpeed;
+  }
+  /**
+   * Run the Handler motor in a "forward" direction
+   */
+  public void handlerMotorDriveForward() {
+    // TODO - implement
+    m_armHandlerMotor.set(getHandlerSpeed());
+  }
 
+  /**
+   * Run the Handler motor in a "backward" direction
+   */
+  public void handlerMotorDriveBackward() {
+    // TODO - implement
+    m_armHandlerMotor.set(-getHandlerSpeed());
+  }
+
+  /**
+   * Stop the Handler motor
+   */
+  public void handlerMotorStop() {
+    // TODO - implement
+    m_armHandlerMotor.set(0.0);
+  }
 
 }

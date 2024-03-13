@@ -8,6 +8,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.ChaseTagCommand;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.AddressableLedSubsystem;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionPoseEstimationSubsystem;
@@ -43,6 +44,7 @@ public class RobotContainer {
   private VisionPoseEstimationSubsystem m_visionPoseEstimationSubsystem = new VisionPoseEstimationSubsystem(m_led);
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(m_visionPoseEstimationSubsystem);
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
+  private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
 
   private SwerveJoystickCmd swerveJoystickCmd;
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem();

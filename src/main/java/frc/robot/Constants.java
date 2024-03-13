@@ -171,17 +171,19 @@ public static final class ArmConstants {
   public static double kMaxVelocityRadPerSecond = 0.0;;
   public static double kMaxAccelerationRadPerSecSquared = 0.0;
   public static double kP = 0.0;
-  public static int kMotorPort = 0;
   public static int[] kEncoderPorts = new int[] {28, 29};;
   public static double kSVolts = 0.0;
   public static double kGVolts = 0.0;
   public static double kVVoltSecondPerRad =0.0;
   public static double kAVoltSecondSquaredPerRad = 0.0;
   public static double kArmBumpIncrementRad = (Math.toRadians(1.0));
+  public static double kHandlerDefaultSpeed = 0.0; // -1.0 to 1.0
+ 
   // The offset of the arm from the horizontal in its neutral position,
   // measured from the horizontal
   public static final double kArmOffsetRads = 0.5;
-  public static final int kArmCanbusID = 0;
+  public static final int kArmMotorCANbusID = 26;  // TODO - USE REAL ID
+  public static final int kArmHandlerMotorCANbusID = 25;  // TODO - USE REAL ID
 
 }
 
