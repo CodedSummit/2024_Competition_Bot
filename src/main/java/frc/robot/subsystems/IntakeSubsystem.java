@@ -11,16 +11,13 @@ import java.util.Map;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.commands.IntakeNoteCommand;
 
@@ -51,11 +48,15 @@ public class IntakeSubsystem extends SubsystemBase {
     
     ShuffleboardTab intake = Shuffleboard.getTab("Intake");
     try {
+      // TODO - consider only setting up Shuffleboard for the speed in non-competition configuration
+      //  to avoid inadvertent mucking with the speed in a competition
       nt_intakeSpeed = intake.add("Intake speed", 0.0)
         .withSize(3,1)
         .withWidget(BuiltInWidgets.kNumberSlider)
         .withProperties(Map.of("min", -1, "max", 1))
         .getEntry();
+      intake.add("Start Intake",new InstantCommand(() ->setSpeed())).withPosition(0,1);
+      intake.add("Cancel Intake", new InstantCommand(() ->stop())).withPosition(1,1);
     } catch (Exception e) {// eat it.  for some reason it fails if the tab exists
     }
   }
@@ -64,8 +65,6 @@ public class IntakeSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     m_hasNote = !m_beamSwitch.get();  // assumes switch "true" means the beam is NOT broken (Thus no Note)
     // TODO - we could consider lighting up the LED strip if we just picked up a Note
-    var d = getIntakeSpeed();
-    System.out.println("    intake speed:"+m_intakeSpeed);
   }
 
   @Override
@@ -74,6 +73,8 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public double getIntakeSpeed() {
+     // TODO - consider only setting up Shuffleboard for the speed in non-competition configuration
+      //  to avoid inadvertent mucking with the speed in a competition
     m_intakeSpeed = nt_intakeSpeed.getDouble(IntakeConstants.kIntakeSpeed);
     return m_intakeSpeed;
   }
@@ -89,6 +90,7 @@ public class IntakeSubsystem extends SubsystemBase {
   public void setSpeed() {
     // TODO - implement
     m_motor.set(getIntakeSpeed());
+    System.out.println(" Set intake speed to:"+m_intakeSpeed);
   }
 
   /**
@@ -97,6 +99,7 @@ public class IntakeSubsystem extends SubsystemBase {
   public void stop() {
     // TODO -implement
     m_motor.set(0.0);
+    System.out.println(" Stopping Intake");
   }
 
   /**
