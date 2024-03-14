@@ -173,6 +173,8 @@ public static final class ArmConstants {
   public static double kAVoltSecondSquaredPerRad = 0.0;
   public static double kArmBumpIncrementRad = (Math.toRadians(1.0));
   public static double kHandlerDefaultSpeed = 0.1; // -1.0 to 1.0
+public static String kArmHandlerSpeedPrefKey = "Arm.handlerSpeed";
+
  
   // The offset of the arm from the horizontal in its neutral position,
   // measured from the horizontal
@@ -188,6 +190,8 @@ public static final class ShooterConstants {
 
   public static final int kShooterCanbusID = 7;
   public static double kShooterSpeed = 0.5;
+  public static String kShooterSpeedPrefKey = "Shooter.ShooterSpeed";
+
 }
 
 
@@ -198,6 +202,9 @@ public static final class IntakeConstants {
   public static final int kIntakeCanbusID = 8;
   public static int kIntakeBeambreakID = 8; // digital ID for the beam break switch
   public static double kIntakeSpeed = 0.1;  // set to real speed -1.0 to 1.0
+  public static String kIntakeSpeedPrefKey = "Intake.IntakeSpeed";
+  public static double kFeedShooterSpeed = 0.6;
+  public static double kFeedArmSpeed = -0.3;
 }
 
 }
