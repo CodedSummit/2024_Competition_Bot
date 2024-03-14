@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
 
@@ -43,10 +44,12 @@ public class NoteShooterSubsystem extends SubsystemBase {
 
   public void spinUp() {
     // start the motor at some pre-defined constant speed
-    m_motor.set(ShooterConstants.kShooterSpeed);
+    m_motor.set(-ShooterConstants.kShooterSpeed);
   }
 
   public void stop() {
     m_motor.set(0.0);
   }
+
+  
 }

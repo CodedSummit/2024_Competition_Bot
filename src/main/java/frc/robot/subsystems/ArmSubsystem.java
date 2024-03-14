@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import java.util.Map;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -45,7 +46,9 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
   // TODO - set real motor type, real encoder type and various constants
   private final CANSparkMax m_armMotor = new CANSparkMax(ArmConstants.kArmMotorCANbusID, MotorType.kBrushless);  // motor that moves the arm
   private final CANSparkMax m_armHandlerMotor = new CANSparkMax(ArmConstants.kArmHandlerMotorCANbusID, MotorType.kBrushless); // motor to handle the Note
-  private final Encoder m_encoder = new Encoder(ArmConstants.kEncoderPorts[0], ArmConstants.kEncoderPorts[1]);
+  private final RelativeEncoder m_encoder = m_armMotor.getEncoder();
+  
+  //private final Encoder m_encoder = new Encoder(ArmConstants.kEncoderPorts[0], ArmConstants.kEncoderPorts[1]);
   private final ArmFeedforward m_feedforward = new ArmFeedforward(
       ArmConstants.kSVolts, ArmConstants.kGVolts,
       ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
@@ -83,13 +86,18 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
     // Calculate the feedforward from the sepoint
     double feedforward = m_feedforward.calculate(setpoint.position, setpoint.velocity);
     // Add the feedforward to the PID output to get the motor output
-    m_armMotor.setVoltage(output + feedforward);
+    double target_voltage = output + feedforward;
+    
+    //limit max voltage at point of applying to motor.
+    target_voltage = Math.min(target_voltage, 0.2);
+
+    m_armMotor.setVoltage(target_voltage);
   }
 
   @Override
   public double getMeasurement() {
     // TODO - implement
-    return m_encoder.getDistance() + ArmConstants.kArmOffsetRads;
+    return m_encoder.getPosition() + ArmConstants.kArmOffsetRads;
   }
 
   
@@ -117,11 +125,49 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
     if ( Math.toDegrees(newGoal) < ArmConstants.kMinArmAngleDeg) newGoal = Math.toRadians(ArmConstants.kMinArmAngleDeg);
     setGoal(newGoal);
   }
+
+
+  public void manualArmUp(){
+     m_armMotor.set(1);
+  }
+  public void manualArmDown(){
+    m_armMotor.set(-1);
+  }
  
+  public void manualArmStop(){
+    m_armMotor.stopMotor();
+  }
+
+  public double manualPosition(){
+    //0 is home, at the bottom
+    //285 is near the top
+    //480 is about max on the other side.
+    //Warning! this encoder value depends on where the arm is when the robot turns on
+    //   make sure it is at home when turned on, or the values will not match.
+    return m_encoder.getPosition();
+  }
+
+  public boolean manualAtHome(){
+    return manualPosition() < 10;
+  }
+
+  public void manualDropPiece(){
+    if(manualPosition() < 30){
+      //piece up
+      handlerMotorDriveForward();
+    } else if(manualPosition() < 285){
+      //piece down on front side
+      handlerMotorDriveBackward();
+    } else {
+      //piece down on back side
+      handlerMotorDriveForward();
+    }
+  }
+
   private void setupShuffleboard() {
     // use Shuffleboard to facilitate controller param tuning
     ShuffleboardTab arm = Shuffleboard.getTab("Arm");
-    try {
+    //try {
       arm.add("Arm Control PID", m_controller);
       
       nt_handlerSpeed = arm.add("Handler speed", 0.0)
@@ -129,12 +175,16 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
           .withWidget(BuiltInWidgets.kNumberSlider)
           .withProperties(Map.of("min", -1, "max", 1))
           .getEntry();
+
       arm.add("Start Handler Forward", new InstantCommand(() -> handlerMotorDriveForward())).withPosition(1, 1);
       arm.add("Start Handler Reverse", new InstantCommand(() -> handlerMotorDriveBackward())).withPosition(2, 1);
 
+      
       arm.add("Cancel Handler", new InstantCommand(() -> handlerMotorStop())).withPosition(3, 1);
-    } catch (Exception e) {// eat it. for some reason it fails if the tab exists
-    }
+      arm.addDouble("position", () -> m_encoder.getPosition()).withPosition(4,1);
+      arm.addDouble("arm motor", () -> m_armMotor.get());
+    //} catch (Exception e) {// eat it. for some reason it fails if the tab exists
+    //}
   }
 
   public double getHandlerSpeed() {
