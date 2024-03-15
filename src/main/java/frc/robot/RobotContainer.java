@@ -17,6 +17,7 @@ import frc.robot.subsystems.NoteShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionPoseEstimationSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -70,6 +71,7 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    CameraServer.startAutomaticCapture();
     // Configure the trigger bindings
 
     swerveJoystickCmd = new SwerveJoystickCmd(
