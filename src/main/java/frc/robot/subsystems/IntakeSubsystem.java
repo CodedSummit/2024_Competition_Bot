@@ -55,8 +55,11 @@ public class IntakeSubsystem extends SubsystemBase {
         .withWidget(BuiltInWidgets.kNumberSlider)
         .withProperties(Map.of("min", -1, "max", 1))
         .getEntry();
+
       intake.add("Start Intake",new InstantCommand(() ->setSpeed())).withPosition(0,1);
       intake.add("Cancel Intake", new InstantCommand(() ->stop())).withPosition(1,1);
+      intake.add("feed note", pickupPiece());
+      intake.addBoolean("Has Note", () -> m_hasNote).withPosition(3, 0);
     } catch (Exception e) {// eat it.  for some reason it fails if the tab exists
     }
   }
@@ -91,6 +94,14 @@ public class IntakeSubsystem extends SubsystemBase {
     // TODO - implement
     m_motor.set(getIntakeSpeed());
     System.out.println(" Set intake speed to:"+m_intakeSpeed);
+  }
+
+  public void feedShooter(){
+    m_motor.set(.6); //speed for feeding shooter
+  }
+
+  public void feedArm(){
+    m_motor.set(-.3);
   }
 
   /**
