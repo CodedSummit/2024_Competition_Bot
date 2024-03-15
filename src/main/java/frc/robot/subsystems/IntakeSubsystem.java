@@ -12,6 +12,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -36,12 +37,16 @@ public class IntakeSubsystem extends SubsystemBase {
   private boolean m_hasNote = false; // is known to be holding a Note
   private CANSparkMax m_motor  = new CANSparkMax(IntakeConstants.kIntakeCanbusID, MotorType.kBrushless);
   private DigitalInput m_beamSwitch = new DigitalInput(IntakeConstants.kIntakeBeambreakID);
-  // TODO - use the beam break to know a Note is picked up
-  private double m_intakeSpeed = IntakeConstants.kIntakeSpeed;
+  private double m_intakeSpeed;
   private GenericEntry nt_intakeSpeed;
 
   public IntakeSubsystem() {
+    loadPreferences();
     setupShuffleboard();
+  }
+
+  private void loadPreferences() {
+    m_intakeSpeed = Preferences.getDouble(IntakeConstants.kIntakeSpeedPrefKey, IntakeConstants.kIntakeSpeed);
   }
 
   private void setupShuffleboard() {
@@ -50,7 +55,7 @@ public class IntakeSubsystem extends SubsystemBase {
     try {
       // TODO - consider only setting up Shuffleboard for the speed in non-competition configuration
       //  to avoid inadvertent mucking with the speed in a competition
-      nt_intakeSpeed = intake.add("Intake speed", 0.0)
+      nt_intakeSpeed = intake.addPersistent("Intake speed", m_intakeSpeed)
         .withSize(3,1)
         .withWidget(BuiltInWidgets.kNumberSlider)
         .withProperties(Map.of("min", -1, "max", 1))
@@ -76,9 +81,14 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public double getIntakeSpeed() {
-     // TODO - consider only setting up Shuffleboard for the speed in non-competition configuration
-      //  to avoid inadvertent mucking with the speed in a competition
-    m_intakeSpeed = nt_intakeSpeed.getDouble(IntakeConstants.kIntakeSpeed);
+
+    if (m_intakeSpeed != nt_intakeSpeed.getDouble(IntakeConstants.kIntakeSpeed)) {
+      // get the value from the Shuffleboard slider.  If it changed salt it away for future reboots
+      m_intakeSpeed = nt_intakeSpeed.getDouble(IntakeConstants.kIntakeSpeed);
+      Preferences.setDouble(IntakeConstants.kIntakeSpeedPrefKey, m_intakeSpeed);
+      System.out.println(" intake speed changed to "+m_intakeSpeed);
+    }
+    
     return m_intakeSpeed;
   }
   public boolean hasNote() {
@@ -97,11 +107,11 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void feedShooter(){
-    m_motor.set(.6); //speed for feeding shooter
+    m_motor.set(IntakeConstants.kFeedShooterSpeed); //speed for feeding shooter
   }
 
   public void feedArm(){
-    m_motor.set(-.3);
+    m_motor.set(IntakeConstants.kFeedArmSpeed);
   }
 
   /**

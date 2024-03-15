@@ -14,16 +14,13 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWM;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.IntakeConstants;
 
 /**
  * Models the Arm that is used for putting Notes in the Amp, as well as
@@ -66,7 +63,12 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
                 ArmConstants.kMaxVelocityRadPerSecond,
                 ArmConstants.kMaxAccelerationRadPerSecSquared)),
         0);
+        loadPreferences();
         setupShuffleboard();
+  }
+
+  private void loadPreferences() {
+     m_handlerSpeed = Preferences.getDouble(ArmConstants.kArmHandlerSpeedPrefKey, ArmConstants.kHandlerDefaultSpeed);
   }
 
   @Override
@@ -167,30 +169,39 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
   private void setupShuffleboard() {
     // use Shuffleboard to facilitate controller param tuning
     ShuffleboardTab arm = Shuffleboard.getTab("Arm");
-    //try {
-      arm.add("Arm Control PID", m_controller);
-      
-      nt_handlerSpeed = arm.add("Handler speed", 0.0)
-          .withSize(3, 1)
-          .withWidget(BuiltInWidgets.kNumberSlider)
-          .withProperties(Map.of("min", -1, "max", 1))
-          .getEntry();
 
-      arm.add("Start Handler Forward", new InstantCommand(() -> handlerMotorDriveForward())).withPosition(1, 1);
-      arm.add("Start Handler Reverse", new InstantCommand(() -> handlerMotorDriveBackward())).withPosition(2, 1);
+    // arm.add("Arm Control PID", m_controller);
 
-      
-      arm.add("Cancel Handler", new InstantCommand(() -> handlerMotorStop())).withPosition(3, 1);
-      arm.addDouble("position", () -> m_encoder.getPosition()).withPosition(4,1);
-      arm.addDouble("arm motor", () -> m_armMotor.get());
-    //} catch (Exception e) {// eat it. for some reason it fails if the tab exists
-    //}
+    nt_handlerSpeed = arm.addPersistent("Handler speed", 0.0)
+        .withSize(3, 1)
+        .withWidget(BuiltInWidgets.kNumberSlider)
+        .withProperties(Map.of("min", -1, "max", 1))
+        .withPosition(0, 0)
+        .getEntry();
+
+    arm.add("Start Handler Forward", new InstantCommand(() -> handlerMotorDriveForward())).withPosition(0, 1);
+    arm.add("Start Handler Reverse", new InstantCommand(() -> handlerMotorDriveBackward())).withPosition(1, 1);
+    arm.add("Cancel Handler", new InstantCommand(() -> handlerMotorStop())).withPosition(2, 1);
+
+    arm.addDouble("position", () -> m_encoder.getPosition()).withPosition(4, 1)
+        .withWidget(BuiltInWidgets.kDial)
+        .withProperties(Map.of("max", 420))
+        .withSize(2, 2)
+        .withPosition(3, 1);
+    arm.addDouble("arm motor", () -> m_armMotor.get())
+        .withPosition(3, 0)
+        .withWidget(BuiltInWidgets.kNumberBar)
+        .withSize(3, 1);
+
   }
 
   public double getHandlerSpeed() {
-     // TODO - consider only setting up Shuffleboard for the speed in non-competition configuration
-      //  to avoid inadvertent mucking with the speed in a competition
-    m_handlerSpeed = nt_handlerSpeed.getDouble(ArmConstants.kHandlerDefaultSpeed);
+ 
+    if (m_handlerSpeed != nt_handlerSpeed.getDouble(ArmConstants.kHandlerDefaultSpeed)) {
+      // get the value from the Shuffleboard slider.  If it changed salt it away for future reboots
+      m_handlerSpeed = nt_handlerSpeed.getDouble(ArmConstants.kHandlerDefaultSpeed);
+      Preferences.setDouble(ArmConstants.kArmHandlerSpeedPrefKey, m_handlerSpeed);
+    }
     return m_handlerSpeed;
   }
   /**
