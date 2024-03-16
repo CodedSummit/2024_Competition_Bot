@@ -117,11 +117,6 @@ public static final class OIConstants {
   public static final double kDeadband = 0.05;
 }
 
-public static final class InputSystemConstants {
-  public static final int kInputMotorCANid = 7;
-}
-
-
 public static final class AutoConstants {
   public static final double kMaxSpeedMetersPerSecond = DriveConstants.kPhysicalMaxSpeedMetersPerSecond / 4;
   public static final double kMaxAngularSpeedRadiansPerSecond = //
@@ -177,13 +172,15 @@ public static final class ArmConstants {
   public static double kVVoltSecondPerRad =0.0;
   public static double kAVoltSecondSquaredPerRad = 0.0;
   public static double kArmBumpIncrementRad = (Math.toRadians(1.0));
-  public static double kHandlerDefaultSpeed = 0.0; // -1.0 to 1.0
+  public static double kHandlerDefaultSpeed = 0.1; // -1.0 to 1.0
+public static String kArmHandlerSpeedPrefKey = "Arm.handlerSpeed";
+
  
   // The offset of the arm from the horizontal in its neutral position,
   // measured from the horizontal
   public static final double kArmOffsetRads = 0.5;
-  public static final int kArmMotorCANbusID = 26;  // TODO - USE REAL ID
-  public static final int kArmHandlerMotorCANbusID = 25;  // TODO - USE REAL ID
+  public static final int kArmMotorCANbusID = 9;  // TODO - USE REAL ID
+  public static final int kArmHandlerMotorCANbusID = 5;  // TODO - USE REAL ID
 
 }
 
@@ -191,8 +188,10 @@ public static final class ShooterConstants {
   // Various constants for the Shooter
   // TODO - set the real values
 
-  public static final int kShooterCanbusID = 0;
-  public static double kShooterSpeed = 0.0;
+  public static final int kShooterCanbusID = 7;
+  public static double kShooterSpeed = 0.5;
+  public static String kShooterSpeedPrefKey = "Shooter.ShooterSpeed";
+
 }
 
 
@@ -200,10 +199,12 @@ public static final class IntakeConstants {
   // Various constants for the Intake subsystem
   // TODO - set the real values
 
-  public static final int kIntakeCanbusID = 0;
-  public static double kShooterSpeed = 0.0;
-  public static int kIntakeBeambreakID = 0; // digital ID for the beam break switch
-  public static double kIntakeSpeed = 0.0;  // set to real speed -1.0 to 1.0
+  public static final int kIntakeCanbusID = 8;
+  public static int kIntakeBeambreakID = 8; // digital ID for the beam break switch
+  public static double kIntakeSpeed = 0.1;  // set to real speed -1.0 to 1.0
+  public static String kIntakeSpeedPrefKey = "Intake.IntakeSpeed";
+  public static double kFeedShooterSpeed = 0.6;
+  public static double kFeedArmSpeed = -0.3;
 }
 
 }

@@ -6,10 +6,14 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.ChaseTagCommand;
+import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.IntakeNoteCommand;
+import frc.robot.commands.NothingCommand;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.AddressableLedSubsystem;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.NoteShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionPoseEstimationSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -20,9 +24,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import java.util.concurrent.locks.Condition;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindHolonomic;
@@ -44,6 +55,7 @@ public class RobotContainer {
   private VisionPoseEstimationSubsystem m_visionPoseEstimationSubsystem = new VisionPoseEstimationSubsystem(m_led);
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(m_visionPoseEstimationSubsystem);
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
+  private final NoteShooterSubsystem m_shooterSubsystem = new NoteShooterSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
 
   private SwerveJoystickCmd swerveJoystickCmd;
@@ -100,10 +112,14 @@ public class RobotContainer {
 
     m_driverController.y().onTrue(new InstantCommand(() -> swerveSubsystem.zeroHeading()));
 
-    Command navToA = makeNavCommand(new Pose2d(1.81, 7.68, new Rotation2d(0)));
-    m_driverController.a().whileTrue(navToA);
+    m_driverController.a().onTrue(new IntakeNoteCommand(m_intakeSubsystem));
+    m_driverController.b().onTrue(ShootCommand());
 
-    m_driverController.x().whileTrue(new ChaseTagCommand(m_visionSubsystem, swerveSubsystem, m_led));
+
+    //Command navToA = makeNavCommand(new Pose2d(1.81, 7.68, new Rotation2d(0)));
+    //m_driverController.a().whileTrue(navToA);
+
+    //m_driverController.x().whileTrue(new ChaseTagCommand(m_visionSubsystem, swerveSubsystem, m_led));
 
     // Left Bumper controls field orientation for drive mode. Upressed (default) is field oriented
     //     Pressed is robot oriented
@@ -119,11 +135,25 @@ public class RobotContainer {
       .onTrue(new InstantCommand(() -> swerveJoystickCmd.setMotionScale(swerveSubsystem.getTurboSpeedFactor())))
       .onFalse(new InstantCommand(() -> swerveJoystickCmd.setMotionScale(swerveSubsystem.getNormalSpeedFactor())));
 
-    m_driverController.povDown().onTrue(new InstantCommand(() ->m_led.setStripBlue()));
-    m_driverController.povUp().onTrue(new InstantCommand(() ->m_led.setStripPurple()));
+    m_driverController.povDown()
+      .onTrue(new InstantCommand(() ->m_armSubsystem.manualArmDown()))
+      .onFalse(new InstantCommand(() -> m_armSubsystem.manualArmStop()));
+    m_driverController.povUp()
+      .onTrue(new InstantCommand(() ->m_armSubsystem.manualArmUp()))
+      .onFalse(new InstantCommand(() -> m_armSubsystem.manualArmStop()));
+    
+    m_driverController.povRight()
+      .onTrue(HandoffToArm());
+
+    m_driverController.povLeft()
+      .onTrue(ArmPiecePlace());
+
+    //m_driverController.povDown().onTrue(new InstantCommand(() ->m_led.setStripBlue()));
+    //m_driverController.povUp().onTrue(new InstantCommand(() ->m_led.setStripPurple()));
+
 
     // temporarily do while true so releasing button stops the path
-    m_driverController.povLeft().whileTrue(swerveSubsystem.followPathCommand("ShortRun"));
+    //m_driverController.povLeft().whileTrue(swerveSubsystem.followPathCommand("ShortRun"));
   }
 
     public void runStartupCalibration(){
@@ -165,6 +195,46 @@ public class RobotContainer {
   public void loadPreferences(){
     swerveSubsystem.loadPreferences();
   }
+
+
+  public Command ShootCommand(){
+    return Commands.sequence(
+      new InstantCommand(() -> m_shooterSubsystem.spinUp()),
+      new WaitCommand(1),
+      new InstantCommand(() -> m_intakeSubsystem.feedShooter()),
+      new WaitUntilCommand(() -> !m_intakeSubsystem.hasNote()),
+      //new WaitCommand(2),
+      new InstantCommand(() -> m_intakeSubsystem.stop()),
+      new WaitCommand(.5),
+      new InstantCommand(() -> m_shooterSubsystem.stop())
+    );
+  }
+
+  public Command HandoffToArm(){
+    return Commands.sequence(
+      new ConditionalCommand(
+        new NothingCommand(), //true
+        new InstantCommand(()->m_armSubsystem.manualArmDown()), //false
+        () -> m_armSubsystem.manualAtHome()), //condition
+      new WaitUntilCommand(()-> m_armSubsystem.manualAtHome()),
+      new InstantCommand(()->m_armSubsystem.manualArmStop()),
+      new PrintCommand("Arm At Home"),
+      new InstantCommand(()->m_armSubsystem.handlerMotorDriveForward()),
+      new InstantCommand(()->m_intakeSubsystem.feedArm()),
+      new WaitCommand(1),
+      new InstantCommand(()-> m_intakeSubsystem.stop()),
+      new InstantCommand(() -> m_armSubsystem.handlerMotorStop())
+    );
+  }
+
+  public Command ArmPiecePlace(){
+    return Commands.sequence(
+      new InstantCommand(()->m_armSubsystem.manualDropPiece()),
+      new WaitCommand(1),
+      new InstantCommand(()->m_armSubsystem.handlerMotorStop())
+    );
+  }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
