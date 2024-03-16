@@ -12,7 +12,7 @@ import frc.robot.Constants.VisionConstants;
 
 public class VisionSubsystem extends SubsystemBase {
  
-  PhotonCamera m_frontCamera = new PhotonCamera(VisionConstants.kFrontCamName);
+  PhotonCamera m_backCamera = new PhotonCamera(VisionConstants.kBackCamName);
   
   /** Creates a new VisionSubsystem. */
   public VisionSubsystem() {}
@@ -20,18 +20,7 @@ public class VisionSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-/**
 
-
-    var result = m_camera.getLatestResult();
-    // System.out.println("Camera results:"+ result.toString());
-    if (result.hasTargets()) {
-      var target = result.getBestTarget();
-      int targetNumber = target.getFiducialId();
-      // System.out.println(" Target number:"+targetNumber+" Yaw, pitch:" + target.getYaw()+ "  " + target.getPitch());
-    }
-    getRange();
-    **/
   }
 
  
@@ -46,7 +35,7 @@ public class VisionSubsystem extends SubsystemBase {
    */
   public PhotonTrackedTarget getTargetForTag(int AprilTagFiducialID){
     PhotonTrackedTarget target = null;
-    var photonRes = m_frontCamera.getLatestResult();
+    var photonRes = m_backCamera.getLatestResult();
     if (photonRes.hasTargets()) {
       // Find the tag we want to chase
            
