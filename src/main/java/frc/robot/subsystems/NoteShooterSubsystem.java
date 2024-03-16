@@ -7,8 +7,10 @@ package frc.robot.subsystems;
 import java.util.Map;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-
+import com.revrobotics.AbsoluteEncoder;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -35,11 +37,17 @@ public class NoteShooterSubsystem extends SubsystemBase {
   private double m_shooterSpeed;
   private GenericEntry nt_shooterSpeed;
 
+  private DutyCycleEncoder shooter_angle = new DutyCycleEncoder(7);
+//31.2 right now
   /** Creates a new VisionSubsystem. */
   public NoteShooterSubsystem() {
+    
     m_motor.setInverted(true);
      loadPreferences();
      setupShuffleboard();
+
+    shooter_angle.setPositionOffset(.581-.092);
+    shooter_angle.setDistancePerRotation(360);
   }
 
   private void loadPreferences() {
@@ -48,17 +56,17 @@ public class NoteShooterSubsystem extends SubsystemBase {
 
   private void setupShuffleboard() {
 
-    ShuffleboardTab intake = Shuffleboard.getTab("Shooter");
+    ShuffleboardTab shooterTab = Shuffleboard.getTab("Shooter");
 
-    nt_shooterSpeed = intake.addPersistent("Shooter speed", m_shooterSpeed)
+    nt_shooterSpeed = shooterTab.addPersistent("Shooter speed", m_shooterSpeed)
         .withSize(3, 1)
         .withWidget(BuiltInWidgets.kNumberSlider)
         .withProperties(Map.of("min", 0, "max", 1))
         .getEntry();
-
+    shooterTab.addDouble("Angle", () -> getShooterAngle());
+  
   }
-
-  @Override
+    @Override
   public void periodic() {
     // This method will be called once per scheduler run
   }
@@ -66,6 +74,10 @@ public class NoteShooterSubsystem extends SubsystemBase {
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+  }
+
+  public double getShooterAngle(){
+    return shooter_angle.getDistance(); //offset to 0
   }
 
   public double getShooterSpeed() {
