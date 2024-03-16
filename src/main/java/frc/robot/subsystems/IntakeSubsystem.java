@@ -39,8 +39,10 @@ public class IntakeSubsystem extends SubsystemBase {
   private DigitalInput m_beamSwitch = new DigitalInput(IntakeConstants.kIntakeBeambreakID);
   private double m_intakeSpeed;
   private GenericEntry nt_intakeSpeed;
+  private AddressableLedSubsystem m_led;
 
-  public IntakeSubsystem() {
+  public IntakeSubsystem(AddressableLedSubsystem led) {
+    m_led = led;
     loadPreferences();
     setupShuffleboard();
   }
@@ -72,7 +74,12 @@ public class IntakeSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     m_hasNote = !m_beamSwitch.get();  // assumes switch "true" means the beam is NOT broken (Thus no Note)
-    // TODO - we could consider lighting up the LED strip if we just picked up a Note
+  
+    if (hasNote()){
+      m_led.setMiddleOrange();
+    } else {
+      m_led.setMiddleOff();
+    }
   }
 
   @Override

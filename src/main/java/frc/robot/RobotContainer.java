@@ -52,10 +52,10 @@ import com.pathplanner.lib.util.ReplanningConfig;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final AddressableLedSubsystem m_led = new AddressableLedSubsystem(20,9);
+  private final AddressableLedSubsystem m_led = new AddressableLedSubsystem(30,9);
   private VisionPoseEstimationSubsystem m_visionPoseEstimationSubsystem = new VisionPoseEstimationSubsystem(m_led);
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(m_visionPoseEstimationSubsystem);
-  private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
+  private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(m_led);
   private final NoteShooterSubsystem m_shooterSubsystem = new NoteShooterSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
 
@@ -225,7 +225,7 @@ public class RobotContainer {
       new InstantCommand(()->m_intakeSubsystem.feedArm()),
       new WaitCommand(1),
       new InstantCommand(()-> m_intakeSubsystem.stop()),
-      new InstantCommand(() -> m_armSubsystem.handlerMotorStop())
+      new InstantCommand(() -> m_armSubsystem.handlerMotorStop(), m_armSubsystem)
     );
   }
 

@@ -85,6 +85,39 @@ setStripColor(255,0,0);
     setStripColor(0,0,0);
   }
 
+  public void setMiddleOrange(){
+    setMiddle(255,75,0);
+  }
+
+  public void setMiddleOff(){
+    setMiddle(0,0,0);
+  }
+  
+
+  public void setMiddle(int r, int g, int b){
+    for(int i = 10; i<20 ; i++){
+      m_buffer.setRGB(i,r,g,b);
+    }
+  }
+
+  public void setEndsGreen(){
+    setEnds(0,225,0);
+  }
+  public void setEndsOff(){
+    setEnds(0,0,0);
+  }
+
+  public void setEnds(int r, int g, int b){
+    for(int i = 0; i<10 ; i++){
+      m_buffer.setRGB(i,r,g,b);
+    }
+    for(int i = 20; i<30 ; i++){
+      m_buffer.setRGB(i,r,g,b);
+    }
+  }
+
+  
+
   // Both setStripLowerHalf and setStripUpperHalf are experimental and may not work as expected (or at all).
   public void setStripLowerHalf(int r, int g, int b){
     for(int i = 0; i<m_buffer.getLength() - (int) m_buffer.getLength()/2; i++){
