@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -64,8 +65,10 @@ public class RobotContainer {
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  private final CommandPS5Controller m_drivPs5Controller = 
+    new CommandPS5Controller(0);
+  //private final CommandXboxController m_driverController =
+  //    new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
   private final SendableChooser<Command> autoChooser;
   
@@ -80,7 +83,7 @@ public class RobotContainer {
 
     swerveJoystickCmd = new SwerveJoystickCmd(
       swerveSubsystem,
-      m_driverController);
+      m_drivPs5Controller);
     swerveSubsystem.setDefaultCommand(swerveJoystickCmd); 
 
     // make the chasetag command
@@ -116,10 +119,10 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
 
-    m_driverController.y().onTrue(new InstantCommand(() -> swerveSubsystem.zeroHeading()));
+    m_drivPs5Controller.triangle().onTrue(new InstantCommand(() -> swerveSubsystem.zeroHeading()));
 
-    m_driverController.a().onTrue(new IntakeNoteCommand(m_intakeSubsystem));
-    m_driverController.b().onTrue(ShootCommand());
+    m_drivPs5Controller.cross().onTrue(new IntakeNoteCommand(m_intakeSubsystem));
+    m_drivPs5Controller.circle().onTrue(ShootCommand());
 
 
     //Command navToA = makeNavCommand(new Pose2d(1.81, 7.68, new Rotation2d(0)));
@@ -129,35 +132,35 @@ public class RobotContainer {
 
     // Left Bumper controls field orientation for drive mode. Upressed (default) is field oriented
     //     Pressed is robot oriented
-    m_driverController.leftBumper()
+    m_drivPs5Controller.button(5)
       .onTrue(new InstantCommand(() -> swerveJoystickCmd.setFieldOriented(false)))
       .onFalse(new InstantCommand(() -> swerveJoystickCmd.setFieldOriented(true)));
 
       //reverse robot orientation mode
-      m_driverController.axisGreaterThan(2, 0.5)
+      m_drivPs5Controller.axisGreaterThan(3, 0.5)
       .onTrue(new InstantCommand(() -> swerveJoystickCmd.setReverseFieldOriented(true)))
       .onFalse(new InstantCommand(() -> swerveJoystickCmd.setReverseFieldOriented(false)));
 
 
-    m_driverController.rightBumper()
+    m_drivPs5Controller.button(6)
       .onTrue(new InstantCommand(() -> swerveJoystickCmd.setMotionScale(swerveSubsystem.getDampenedSpeedFactor())))
       .onFalse(new InstantCommand(() -> swerveJoystickCmd.setMotionScale(swerveSubsystem.getNormalSpeedFactor())));
 
-    m_driverController.axisGreaterThan(3, 0.5)
+    m_drivPs5Controller.axisGreaterThan(4, 0.5)
       .onTrue(new InstantCommand(() -> swerveJoystickCmd.setMotionScale(swerveSubsystem.getTurboSpeedFactor())))
       .onFalse(new InstantCommand(() -> swerveJoystickCmd.setMotionScale(swerveSubsystem.getNormalSpeedFactor())));
 
-    m_driverController.povDown()
+    m_drivPs5Controller.povDown()
       .onTrue(new InstantCommand(() ->m_armSubsystem.manualArmDown()))
       .onFalse(new InstantCommand(() -> m_armSubsystem.manualArmStop()));
-    m_driverController.povUp()
+    m_drivPs5Controller.povUp()
       .onTrue(new InstantCommand(() ->m_armSubsystem.manualArmUp()))
       .onFalse(new InstantCommand(() -> m_armSubsystem.manualArmStop()));
     
-    m_driverController.povRight()
+    m_drivPs5Controller.povRight()
       .onTrue(HandoffToArm());
 
-    m_driverController.povLeft()
+    m_drivPs5Controller.povLeft()
       .onTrue(ArmPiecePlace());
 
     //m_driverController.povDown().onTrue(new InstantCommand(() ->m_led.setStripBlue()));
