@@ -210,7 +210,7 @@ public class RobotContainer {
 
 
   public Command ShootCommand(){
-    return Commands.sequence(
+    Command x = Commands.sequence(
       new InstantCommand(() -> m_shooterSubsystem.spinUp()),
       new WaitCommand(1),
       new InstantCommand(() -> m_intakeSubsystem.feedShooter()),
@@ -220,6 +220,8 @@ public class RobotContainer {
       new WaitCommand(.5),
       new InstantCommand(() -> m_shooterSubsystem.stop())
     );
+    x.addRequirements(m_shooterSubsystem, m_intakeSubsystem);
+    return x;
   }
 
   public Command HandoffToArm(){
