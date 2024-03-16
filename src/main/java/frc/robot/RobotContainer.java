@@ -18,6 +18,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionPoseEstimationSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -71,7 +72,10 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    CameraServer.startAutomaticCapture();
+    UsbCamera riocam = CameraServer.startAutomaticCapture();
+    riocam.setFPS(5);
+    riocam.setResolution(160, 120);
+    
     // Configure the trigger bindings
 
     swerveJoystickCmd = new SwerveJoystickCmd(
@@ -128,6 +132,12 @@ public class RobotContainer {
     m_driverController.leftBumper()
       .onTrue(new InstantCommand(() -> swerveJoystickCmd.setFieldOriented(false)))
       .onFalse(new InstantCommand(() -> swerveJoystickCmd.setFieldOriented(true)));
+
+      //reverse robot orientation mode
+      m_driverController.axisGreaterThan(2, 0.5)
+      .onTrue(new InstantCommand(() -> swerveJoystickCmd.setReverseFieldOriented(true)))
+      .onFalse(new InstantCommand(() -> swerveJoystickCmd.setReverseFieldOriented(false)));
+
 
     m_driverController.rightBumper()
       .onTrue(new InstantCommand(() -> swerveJoystickCmd.setMotionScale(swerveSubsystem.getDampenedSpeedFactor())))
