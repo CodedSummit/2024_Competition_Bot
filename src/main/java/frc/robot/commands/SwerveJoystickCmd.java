@@ -20,6 +20,7 @@ public class SwerveJoystickCmd extends Command {
     private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
 
     private boolean fieldOriented;
+    private boolean robotOrientationReverse;
     private double motionScale;
 
     public SwerveJoystickCmd(SwerveSubsystem swerveSubsystem, CommandXboxController m_driverController) {
@@ -28,6 +29,7 @@ public class SwerveJoystickCmd extends Command {
         this.ySpdFunction = () -> -m_driverController.getLeftX();
         this.turningSpdFunction = () -> -m_driverController.getRightX();
         this.fieldOriented = true;
+        this.robotOrientationReverse = false;
         this.motionScale = swerveSubsystem.getNormalSpeedFactor();
         this.xLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
         this.yLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
@@ -69,8 +71,12 @@ public class SwerveJoystickCmd extends Command {
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     xSpeed, ySpeed, turningSpeed, swerveSubsystem.getRotation2d());
         } else {
-            // Relative to robot
-            chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turningSpeed);
+            if(this.robotOrientationReverse){
+                chassisSpeeds = new ChassisSpeeds(-xSpeed, -ySpeed, turningSpeed);
+            } else {
+                // Relative to robot, non reversed
+                chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turningSpeed);
+            }
         }
 
         // 5. Convert chassis speeds to individual module states
@@ -82,6 +88,13 @@ public class SwerveJoystickCmd extends Command {
 
     public void setFieldOriented(boolean fieldOriented){
         this.fieldOriented = fieldOriented;
+        SmartDashboard.putBoolean("Field Oriented", fieldOriented);
+    }
+
+    public void setReverseFieldOriented(boolean mode_on){
+        this.fieldOriented = !mode_on;
+        this.robotOrientationReverse = mode_on;
+        
         SmartDashboard.putBoolean("Field Oriented", fieldOriented);
     }
 
