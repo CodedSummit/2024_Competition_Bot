@@ -27,11 +27,11 @@ import frc.robot.Constants.VisionConstants;
  */
 public class VisionPoseEstimationSubsystem extends SubsystemBase {
  
-  PhotonCamera m_frontCamera = new PhotonCamera(VisionConstants.kFrontCamName);
+  PhotonCamera m_backCamera = new PhotonCamera(VisionConstants.kBackCamName);
   PhotonCamera m_leftCamera = new PhotonCamera(VisionConstants.kLeftCamName);
   PhotonCamera m_rightCamera = new PhotonCamera(VisionConstants.kRightCamName);
   AprilTagFieldLayout m_CompetitionAprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
-  PhotonPoseEstimator m_frontCamPhotonPoseEstimator=null;
+  PhotonPoseEstimator m_backCamPhotonPoseEstimator=null;
   PhotonPoseEstimator m_leftCamPhotonPoseEstimator = null;
   PhotonPoseEstimator m_rightCamPhotonPoseEstimator = null;
   private boolean m_visionEnabled = false;
@@ -42,8 +42,8 @@ public class VisionPoseEstimationSubsystem extends SubsystemBase {
     
     m_led = led;
     // Construct PhotonPoseEstimators
-     m_frontCamPhotonPoseEstimator = new PhotonPoseEstimator(m_CompetitionAprilTagFieldLayout, 
-      PoseStrategy.AVERAGE_BEST_TARGETS, m_frontCamera, VisionConstants.kRobotToFrontCam);
+     m_backCamPhotonPoseEstimator = new PhotonPoseEstimator(m_CompetitionAprilTagFieldLayout, 
+      PoseStrategy.AVERAGE_BEST_TARGETS, m_backCamera, VisionConstants.kRobotToBackCam);
      m_leftCamPhotonPoseEstimator = new PhotonPoseEstimator(m_CompetitionAprilTagFieldLayout, 
       PoseStrategy.AVERAGE_BEST_TARGETS, m_leftCamera, VisionConstants.kRobotToLeftCam);
      m_rightCamPhotonPoseEstimator = new PhotonPoseEstimator(m_CompetitionAprilTagFieldLayout, 
@@ -67,6 +67,7 @@ public class VisionPoseEstimationSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
   }
   
+  //  Get the actual estimates from the different cameras (Left (LC), Right (RC), back (BC))
   private Optional<EstimatedRobotPose> getLCEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
       m_leftCamPhotonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
       return m_leftCamPhotonPoseEstimator.update();
@@ -74,6 +75,10 @@ public class VisionPoseEstimationSubsystem extends SubsystemBase {
  private Optional<EstimatedRobotPose> getRCEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
       m_rightCamPhotonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
       return m_rightCamPhotonPoseEstimator.update();
+  }
+  private Optional<EstimatedRobotPose> getBCEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
+      m_backCamPhotonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+      return m_backCamPhotonPoseEstimator.update();
   }
 
   /**
@@ -101,6 +106,13 @@ public class VisionPoseEstimationSubsystem extends SubsystemBase {
         var pose2d = pose.get().estimatedPose.toPose2d();
         poseEstimator.addVisionMeasurement(pose2d, pose.get().timestampSeconds);
         System.out.println(" Updated pose with right cam vision.  x:" + pose2d.getX() + "   y: " + pose2d.getY());
+        received_vision_update = true;
+      }
+      pose = getBCEstimatedGlobalPose(poseEstimator.getEstimatedPosition());
+      if (pose.isPresent()) {
+        var pose2d = pose.get().estimatedPose.toPose2d();
+        poseEstimator.addVisionMeasurement(pose2d, pose.get().timestampSeconds);
+        System.out.println(" Updated pose with back cam vision.  x:" + pose2d.getX() + "   y: " + pose2d.getY());
         received_vision_update = true;
       }
 

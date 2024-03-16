@@ -25,8 +25,6 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class ChaseTagCommand extends Command {
-   
-  // TODO:  Make a constructor that takes the TAG number, the TAG_TO_GOAL offsets, and the CAMERA_TO_ROBOT offsets
   
   // Tranforms from the tag associated with the target to the desired robot position
   private static final Transform2d AMP_TAG_TO_GOAL = new Transform2d(new Translation2d(1, 0), Rotation2d.fromDegrees(180.0));
@@ -153,7 +151,7 @@ private static final Map<FieldGoals,Integer> RED_GOALS;
             camToTarget.getRotation().toRotation2d());
 
         // Transform the robot's pose to find the tag's pose
-        var cameraPose = robotPose.transformBy(VisionConstants.kRobotToFrontCam2d);
+        var cameraPose = robotPose.transformBy(VisionConstants.kRobotToBackCam2d);
         Pose2d targetPose = cameraPose.transformBy(transform);
 
         // Transform the tag's pose to set our goal

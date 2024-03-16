@@ -23,16 +23,16 @@ import frc.robot.subsystems.SwerveSubsystem;
 
 public class DriveToPoseCommand extends Command {
   
-  private static final TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(1, 32);
-  private static final TrapezoidProfile.Constraints Y_CONSTRAINTS = new TrapezoidProfile.Constraints(1, 32);
+  private static final TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(1, 8);
+  private static final TrapezoidProfile.Constraints Y_CONSTRAINTS = new TrapezoidProfile.Constraints(1, 8);
   private static final TrapezoidProfile.Constraints OMEGA_CONSTRATINTS = 
       new TrapezoidProfile.Constraints(.6, 8);
   
   private final SwerveSubsystem m_drivetrainSubsystem;
   
-  private final ProfiledPIDController m_xController = new ProfiledPIDController(4, 1, 0, X_CONSTRAINTS);
-  private final ProfiledPIDController m_yController = new ProfiledPIDController(4, 1, 0, Y_CONSTRAINTS);
-  private final ProfiledPIDController m_omegaController = new ProfiledPIDController(2, 0, 0, OMEGA_CONSTRATINTS);
+  private final ProfiledPIDController m_xController = new ProfiledPIDController(.5, 0, 0, X_CONSTRAINTS);
+  private final ProfiledPIDController m_yController = new ProfiledPIDController(.5, 0, 0, Y_CONSTRAINTS);
+  private final ProfiledPIDController m_omegaController = new ProfiledPIDController(.5, 0, 0, OMEGA_CONSTRATINTS);
 
   private Pose2d m_goalPose;
   private double m_xRobotPose;
