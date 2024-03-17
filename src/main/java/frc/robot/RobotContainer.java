@@ -76,9 +76,13 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    UsbCamera riocam = CameraServer.startAutomaticCapture();
-    riocam.setFPS(5);
-    riocam.setResolution(160, 120);
+    UsbCamera riocam_intake = CameraServer.startAutomaticCapture();
+    riocam_intake.setFPS(5);
+    riocam_intake.setResolution(160, 120);
+
+    UsbCamera riocam_shooter = CameraServer.startAutomaticCapture();
+    riocam_shooter.setFPS(5);
+    riocam_shooter.setResolution(160, 120);
     
     // Configure the trigger bindings
 
