@@ -22,6 +22,7 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.counter.UpDownCounter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -153,15 +154,29 @@ public class RobotContainer {
     m_drivPs5Controller.povDown()
       .onTrue(new InstantCommand(() ->m_armSubsystem.manualArmDown()))
       .onFalse(new InstantCommand(() -> m_armSubsystem.manualArmStop()));
+    m_drivPs5Controller.button(12)
+      .onTrue(new InstantCommand(() ->m_armSubsystem.manualArmDown()))
+      .onFalse(new InstantCommand(() -> m_armSubsystem.manualArmStop()));
+
     m_drivPs5Controller.povUp()
+      .onTrue(new InstantCommand(() ->m_armSubsystem.manualArmUp()))
+      .onFalse(new InstantCommand(() -> m_armSubsystem.manualArmStop()));
+    m_drivPs5Controller.button(11)
       .onTrue(new InstantCommand(() ->m_armSubsystem.manualArmUp()))
       .onFalse(new InstantCommand(() -> m_armSubsystem.manualArmStop()));
     
     m_drivPs5Controller.povRight()
       .onTrue(HandoffToArm());
 
+
     m_drivPs5Controller.povLeft()
       .onTrue(ArmPiecePlace());
+
+    m_drivPs5Controller.button(14)
+      .onTrue(ArmPiecePlace());
+//11 for Up
+//12 dfor down
+//14 for drop
 
     //m_driverController.povDown().onTrue(new InstantCommand(() ->m_led.setStripBlue()));
     //m_driverController.povUp().onTrue(new InstantCommand(() ->m_led.setStripPurple()));

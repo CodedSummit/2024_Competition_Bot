@@ -199,7 +199,7 @@ public class SwerveSubsystem extends SubsystemBase {
         gyro.setYaw(0);
     }
     public void setHeading(double setAngle){
-        //pigeon.setYaw(setAngle);
+        gyro.setYaw(setAngle);
     }
 
     public double getHeading() {

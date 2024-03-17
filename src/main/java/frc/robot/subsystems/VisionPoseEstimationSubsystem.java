@@ -36,11 +36,13 @@ public class VisionPoseEstimationSubsystem extends SubsystemBase {
   PhotonPoseEstimator m_rightCamPhotonPoseEstimator = null;
   private boolean m_visionEnabled = false;
   AddressableLedSubsystem m_led;
+  SwerveSubsystem m_SwerveSubsystem;
 
   /** Creates a new VisionPoseEstimationSubsystem. */
   public VisionPoseEstimationSubsystem(AddressableLedSubsystem led) {
     
     m_led = led;
+
     // Construct PhotonPoseEstimators
      m_backCamPhotonPoseEstimator = new PhotonPoseEstimator(m_CompetitionAprilTagFieldLayout, 
       PoseStrategy.AVERAGE_BEST_TARGETS, m_backCamera, VisionConstants.kRobotToBackCam);
