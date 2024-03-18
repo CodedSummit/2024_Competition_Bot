@@ -159,7 +159,7 @@ public static final class VisionConstants {
   // Use appropriate tag vals based on the alliance membership (B-Blue, R- Red)
   public static final int kBAmpTagID = 6;
   public static final int kBStageTagID = 16;
-  public static final int kBSpeakerTagID = 8;
+  public static final int kBSpeakerTagID = 7;
   public static final int kRAmpTagID = 5;
   public static final int kRStageTagID = 11;
   public static final int kRSpeakerTagID = 4;
