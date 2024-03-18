@@ -7,16 +7,30 @@ package frc.robot.subsystems;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
 
 public class VisionSubsystem extends SubsystemBase {
  
   PhotonCamera m_backCamera = new PhotonCamera(VisionConstants.kBackCamName);
+  private boolean m_boardBuilt  =  false;
   
   /** Creates a new VisionSubsystem. */
-  public VisionSubsystem() {}
+  public VisionSubsystem() {
+    setupShuffleboard();
+  }
 
+  private void setupShuffleboard() {
+
+    if (!m_boardBuilt) {
+      ShuffleboardTab vision = Shuffleboard.getTab("Vision");
+      vision.add("ChaseTag", this).withSize(2,2);
+      m_boardBuilt = true;
+    }
+  }
+  
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
