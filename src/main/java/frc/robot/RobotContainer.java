@@ -23,6 +23,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.counter.UpDownCounter;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,6 +40,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import java.util.Map;
 import java.util.concurrent.locks.Condition;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -114,10 +118,23 @@ public class RobotContainer {
     // Another option that allows you to specify the default auto by its name
     // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
 
+    setupShuffleboard();
+    
     SmartDashboard.putData("Auto Chooser", autoChooser);
     SmartDashboard.putData("poseestimator", m_visionPoseEstimationSubsystem);
 
   }
+
+  private void setupShuffleboard() {
+    
+    ShuffleboardTab sys = Shuffleboard.getTab("Systems");
+
+    sys.add(m_shooterSubsystem);
+    sys.add(m_intakeSubsystem);
+    sys.add(m_armSubsystem);
+
+  }
+
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
@@ -257,7 +274,7 @@ public class RobotContainer {
   }
 
   public Command HandoffToArm(){
-    return Commands.sequence(
+    Command handoff = Commands.sequence(
       new ConditionalCommand(
         new NothingCommand(), //true
         new InstantCommand(()->m_armSubsystem.manualArmDown()), //false
@@ -277,11 +294,13 @@ public class RobotContainer {
   }
 
   public Command ArmPiecePlace(){
-    return Commands.sequence(
+    Command place = Commands.sequence(
       new InstantCommand(()->m_armSubsystem.manualDropPiece()),
       new WaitCommand(1),
       new InstantCommand(()->m_armSubsystem.handlerMotorStop())
     );
+    place.addRequirements(m_armSubsystem);
+    return place;
   }
 
 
