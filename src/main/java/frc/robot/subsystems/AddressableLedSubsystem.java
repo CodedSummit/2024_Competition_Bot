@@ -98,6 +98,7 @@ setStripColor(255,0,0);
     for(int i = 10; i<20 ; i++){
       m_buffer.setRGB(i,r,g,b);
     }
+    m_led.setData(m_buffer);
   }
 
   public void setEndsGreen(){
@@ -114,6 +115,7 @@ setStripColor(255,0,0);
     for(int i = 20; i<30 ; i++){
       m_buffer.setRGB(i,r,g,b);
     }
+    m_led.setData(m_buffer);
   }
 
   
