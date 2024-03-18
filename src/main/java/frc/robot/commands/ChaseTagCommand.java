@@ -137,7 +137,7 @@ private static final Map<FieldGoals,Integer> RED_GOALS;
          // restart our timer on fresh target data (start() method is no-op if alredy running)
         m_TargetLastSeen.start();
         m_TargetLastSeen.reset();
-        m_LedSubsystem.setStripYellow();
+        m_LedSubsystem.setEndsYellow();
       }
       
       if (target != null && targetDataSignificantlyDifferent(target, m_lastTarget)) {
@@ -193,12 +193,15 @@ private static final Map<FieldGoals,Integer> RED_GOALS;
 
 public boolean isFinished(){
 
-    if (m_driveToPoseCmd.isFinished()) return true;  // we got to where we're going
+    if (m_driveToPoseCmd.isFinished()){
+      m_LedSubsystem.setEndsGreen();
+      return true;  // we got to where we're going
+    } 
 
     if (m_TargetLastSeen.hasElapsed(STALE_TARGET_TIME)){
       // If we haven't gotten new target data in a while we may have lost sight of it and should stop
       System.out.println("Have not seen the target lately - STOPPING");
-      m_LedSubsystem.setStripRed();
+      m_LedSubsystem.setEndsRed();
       return true;
     }
     return false;

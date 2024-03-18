@@ -101,9 +101,18 @@ setStripColor(255,0,0);
     m_led.setData(m_buffer);
   }
 
-  public void setEndsGreen(){
-    setEnds(0,225,0);
+  public void setEndsGreen() {
+    setEnds(0, 225, 0);
   }
+
+  public void setEndsYellow() {
+    setEnds(255, 125, 0);
+  }
+
+  public void setEndsRed() {
+    setEnds(255, 0, 0);
+  }
+
   public void setEndsOff(){
     setEnds(0,0,0);
   }
