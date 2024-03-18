@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.concurrent.locks.Condition;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathfindHolonomic;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -90,6 +91,13 @@ public class RobotContainer {
       swerveSubsystem,
       m_drivPs5Controller);
     swerveSubsystem.setDefaultCommand(swerveJoystickCmd); 
+
+    //Named commands for Autos
+    NamedCommands.registerCommand("Intake", new IntakeNoteCommand(m_intakeSubsystem));
+    NamedCommands.registerCommand("Shoot", ShootCommand());
+
+
+    
 
     // make the chasetag command
 
