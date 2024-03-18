@@ -64,8 +64,19 @@ public class NoteShooterSubsystem extends SubsystemBase {
         .withProperties(Map.of("min", 0, "max", 1))
         .getEntry();
     shooterTab.addDouble("Angle", () -> getShooterAngle());
+
+    shooterTab.addString("Current Command", () -> current_command_name());
   
   }
+
+  public String current_command_name(){
+    String command_name = "---";
+    if(this.getCurrentCommand() != null){
+      command_name = this.getCurrentCommand().getName();
+    }
+    return command_name;
+    }
+
     @Override
   public void periodic() {
     // This method will be called once per scheduler run

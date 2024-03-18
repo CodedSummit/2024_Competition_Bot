@@ -134,8 +134,9 @@ public class RobotContainer {
 
     m_drivPs5Controller.triangle().onTrue(new InstantCommand(() -> swerveSubsystem.zeroHeading()));
 
-    m_drivPs5Controller.cross().onTrue(new IntakeNoteCommand(m_intakeSubsystem));
-    m_drivPs5Controller.circle().onTrue(ShootCommand());
+    m_drivPs5Controller.cross().toggleOnTrue(new IntakeNoteCommand(m_intakeSubsystem));
+    Command shootCommand = ShootCommand();
+    m_drivPs5Controller.circle().toggleOnTrue(shootCommand);
 
 
     //Command navToA = makeNavCommand(new Pose2d(1.81, 7.68, new Rotation2d(0)));
@@ -178,7 +179,7 @@ public class RobotContainer {
       .onFalse(new InstantCommand(() -> m_armSubsystem.manualArmStop()));
     
     m_drivPs5Controller.povRight()
-      .onTrue(HandoffToArm());
+      .toggleOnTrue(HandoffToArm());
 
 
     m_drivPs5Controller.povLeft()
@@ -250,6 +251,7 @@ public class RobotContainer {
       new WaitCommand(.5),
       new InstantCommand(() -> m_shooterSubsystem.stop())
     );
+    x.setName("Shoot");
     x.addRequirements(m_shooterSubsystem, m_intakeSubsystem);
     return x;
   }
@@ -269,6 +271,9 @@ public class RobotContainer {
       new InstantCommand(()-> m_intakeSubsystem.stop()),
       new InstantCommand(() -> m_armSubsystem.handlerMotorStop(), m_armSubsystem)
     );
+    handoff.setName("Handoff");
+    handoff.addRequirements(m_armSubsystem, m_intakeSubsystem);
+    return handoff;
   }
 
   public Command ArmPiecePlace(){

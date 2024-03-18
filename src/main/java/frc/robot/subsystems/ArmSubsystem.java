@@ -193,8 +193,17 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
         .withWidget(BuiltInWidgets.kNumberBar)
         .withSize(3, 1);
 
-  }
+    arm.addString("Current Command", () -> current_command_name());
 
+
+  }
+  public String current_command_name(){
+    String command_name = "---";
+    if(this.getCurrentCommand() != null){
+      command_name = this.getCurrentCommand().getName();
+    }
+    return command_name;
+    }
   public double getHandlerSpeed() {
  
     if (m_handlerSpeed != nt_handlerSpeed.getDouble(ArmConstants.kHandlerDefaultSpeed)) {

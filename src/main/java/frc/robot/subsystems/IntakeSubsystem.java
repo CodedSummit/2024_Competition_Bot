@@ -67,9 +67,24 @@ public class IntakeSubsystem extends SubsystemBase {
       intake.add("Cancel Intake", new InstantCommand(() ->stop())).withPosition(1,1);
       intake.add("feed note", pickupPiece());
       intake.addBoolean("Has Note", () -> m_hasNote).withPosition(3, 0);
+
+
+
+      
+
+      intake.addString("Current Command", () -> current_command_name());
+
     } catch (Exception e) {// eat it.  for some reason it fails if the tab exists
     }
   }
+  public String current_command_name(){
+          String command_name = "---";
+      if(this.getCurrentCommand() != null){
+        command_name = this.getCurrentCommand().getName();
+      }
+      return command_name;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
