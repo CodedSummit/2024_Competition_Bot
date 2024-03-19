@@ -1,6 +1,8 @@
 package frc.robot.commands;
 
 
+import static edu.wpi.first.math.util.Units.inchesToMeters;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +29,7 @@ import frc.robot.subsystems.VisionSubsystem;
 public class ChaseTagCommand extends Command {
   
   // Tranforms from the tag associated with the target to the desired robot position
-  private static final Transform2d AMP_TAG_TO_GOAL = new Transform2d(new Translation2d(0, 0), Rotation2d.fromDegrees(180.0));
+  private static final Transform2d AMP_TAG_TO_GOAL = new Transform2d(new Translation2d(inchesToMeters(17.5), 0), Rotation2d.fromDegrees(180.0));
   private static final Transform2d SPEAKER_TAG_TO_GOAL = new Transform2d(new Translation2d(2, 0), Rotation2d.fromDegrees(180.0));
   private static final Transform2d STAGE_TAG_TO_GOAL = new Transform2d(new Translation2d(1, 0), Rotation2d.fromDegrees(180.0));
 
