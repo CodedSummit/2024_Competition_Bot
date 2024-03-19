@@ -4,7 +4,20 @@
 
 package frc.robot.subsystems;
 
+
+
+import java.util.Map;
+
+import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ClimbConstants;
+import frc.robot.Constants.ShooterConstants;
 
 /**
  * Models the mechanism that is used to climb at the end of a match.
@@ -17,9 +30,33 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * use a ratchet to manually
  * adjust the motor (it's a worm gearbox, so not backdrivable).
  */
-public class ClimbSubsystem extends SubsystemBase {
 
+ 
+public class ClimbSubsystem extends SubsystemBase {
+private TalonFX m_motor = new TalonFX(ClimbConstants.kClimbCanbusID, "rio");
+  private double m_climbSpeed;
+  private GenericEntry nt_climbSpeed;
+  
   public ClimbSubsystem() {
+    loadPreferences();
+    setupShuffleboard();
+  }
+
+  private void loadPreferences() {
+    m_climbSpeed = Preferences.getDouble(ClimbConstants.kClimbSpeedPrefKey, ClimbConstants.kClimbSpeed);
+  }
+
+  private void setupShuffleboard() {
+
+    ShuffleboardTab climbTab = Shuffleboard.getTab("Climb");
+
+    nt_climbSpeed = climbTab.addPersistent("Climber speed", m_climbSpeed)
+        .withSize(3, 1)
+        .withWidget(BuiltInWidgets.kNumberSlider)
+        .withProperties(Map.of("min", 0, "max", 1))
+        .getEntry();
+    
+  
   }
 
   @Override
@@ -39,5 +76,23 @@ public class ClimbSubsystem extends SubsystemBase {
    */
   public void climb() {
     // TODO - implement
+    m_motor.set(getClimbSpeed());
+  }
+  public double getClimbSpeed() {
+
+    if (m_climbSpeed != nt_climbSpeed.getDouble(ClimbConstants.kClimbSpeed)) {
+      // get the value from the Shuffleboard slider.  If it changed salt it away for future reboots
+      m_climbSpeed = nt_climbSpeed.getDouble(ClimbConstants.kClimbSpeed);
+      Preferences.setDouble(ClimbConstants.kClimbSpeedPrefKey, m_climbSpeed);
+    }
+    return m_climbSpeed;
+  } 
+
+  public void lower() {
+    m_motor.set(-getClimbSpeed());
+  }
+
+  public void stop() {
+    m_motor.set(0.0);
   }
 }

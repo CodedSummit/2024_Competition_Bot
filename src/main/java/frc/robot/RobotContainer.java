@@ -12,6 +12,7 @@ import frc.robot.commands.NothingCommand;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.AddressableLedSubsystem;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.NoteShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -66,6 +67,7 @@ public class RobotContainer {
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(m_led);
   private final NoteShooterSubsystem m_shooterSubsystem = new NoteShooterSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
+  private final ClimbSubsystem m_ClimbSubsystem = new ClimbSubsystem();
 
   private SwerveJoystickCmd swerveJoystickCmd;
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem();
@@ -156,6 +158,9 @@ public class RobotContainer {
     m_drivPs5Controller.cross().toggleOnTrue(new IntakeNoteCommand(m_intakeSubsystem));
     Command shootCommand = ShootCommand();
     m_drivPs5Controller.circle().toggleOnTrue(shootCommand);
+    m_drivPs5Controller.square()
+      .onTrue(new InstantCommand(() ->m_ClimbSubsystem.climb()))
+      .onFalse(new InstantCommand(() -> m_ClimbSubsystem.stop()));
 
 
     //Command navToA = makeNavCommand(new Pose2d(1.81, 7.68, new Rotation2d(0)));

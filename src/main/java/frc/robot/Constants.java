@@ -216,4 +216,10 @@ public static final class IntakeConstants {
   public static double kFeedArmSpeed = -0.3;
 }
 
+public static final class ClimbConstants {
+  public static final int kClimbCanbusID = 13;
+  public static double kClimbSpeed = 0.5;
+  public static String kClimbSpeedPrefKey = "Shooter.ShooterSpeed";
+}
+
 }
