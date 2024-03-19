@@ -133,6 +133,8 @@ public class RobotContainer {
     sys.add(m_intakeSubsystem);
     sys.add(m_armSubsystem);
 
+    sys.add(ShootCommand());
+
   }
 
 
@@ -184,14 +186,14 @@ public class RobotContainer {
     m_drivPs5Controller.povDown()
       .onTrue(new InstantCommand(() ->m_armSubsystem.manualArmDown()))
       .onFalse(new InstantCommand(() -> m_armSubsystem.manualArmStop()));
-    m_drivPs5Controller.button(12)
+    m_drivPs5Controller.button(11)
       .onTrue(new InstantCommand(() ->m_armSubsystem.manualArmDown()))
       .onFalse(new InstantCommand(() -> m_armSubsystem.manualArmStop()));
 
     m_drivPs5Controller.povUp()
       .onTrue(new InstantCommand(() ->m_armSubsystem.manualArmUp()))
       .onFalse(new InstantCommand(() -> m_armSubsystem.manualArmStop()));
-    m_drivPs5Controller.button(11)
+    m_drivPs5Controller.button(12)
       .onTrue(new InstantCommand(() ->m_armSubsystem.manualArmUp()))
       .onFalse(new InstantCommand(() -> m_armSubsystem.manualArmStop()));
     
@@ -277,7 +279,7 @@ public class RobotContainer {
     Command handoff = Commands.sequence(
       new ConditionalCommand(
         new NothingCommand(), //true
-        new InstantCommand(()->m_armSubsystem.manualArmDown()), //false
+        new NothingCommand(), //false //this will do nothing till the arm is down
         () -> m_armSubsystem.manualAtHome()), //condition
       new WaitUntilCommand(()-> m_armSubsystem.manualAtHome()),
       new InstantCommand(()->m_armSubsystem.manualArmStop()),
@@ -289,6 +291,26 @@ public class RobotContainer {
       new InstantCommand(() -> m_armSubsystem.handlerMotorStop(), m_armSubsystem)
     );
     handoff.setName("Handoff");
+    handoff.addRequirements(m_armSubsystem, m_intakeSubsystem);
+    return handoff;
+  }
+
+    public Command HandoffToArmAutoPosition(){
+    Command handoff = Commands.sequence(
+      new ConditionalCommand(
+        new NothingCommand(), //true
+        new InstantCommand(()->m_armSubsystem.manualArmDown()), //false
+        () -> m_armSubsystem.manualAtHome()), //condition
+      new WaitUntilCommand(()-> m_armSubsystem.manualAtHome()),
+      new InstantCommand(()->m_armSubsystem.manualArmStop()),
+      new PrintCommand("Arm At Home"),
+      new InstantCommand(()->m_armSubsystem.handlerMotorDriveForward()),
+      new InstantCommand(()->m_intakeSubsystem.feedArm()),
+      new WaitCommand(1),
+      new InstantCommand(()-> m_intakeSubsystem.stop()),
+      new InstantCommand(() -> m_armSubsystem.handlerMotorStop(), m_armSubsystem)
+    );
+    handoff.setName("Handoff Auto Position");
     handoff.addRequirements(m_armSubsystem, m_intakeSubsystem);
     return handoff;
   }

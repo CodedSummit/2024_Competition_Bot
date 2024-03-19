@@ -96,13 +96,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void initialize() {
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000);
-                zeroHeading();
-            } catch (Exception e) {
-            }
-        }).start();
+
         loadPreferences();
 
         ShuffleboardTab swerveTab = Shuffleboard.getTab("Swerve");
@@ -148,9 +142,9 @@ public class SwerveSubsystem extends SubsystemBase {
             this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
             new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
                     new PIDConstants(2.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
-                    0.5, //4.5, // Max module speed, in m/s
-                    0.4, // Drive base radius in meters. Distance from robot center to furthest module.
+                    new PIDConstants(2.0, 0.0, 0.0), // Rotation PID constants
+                    1, //4.5, // Max module speed, in m/s
+                    0.5, // Drive base radius in meters. Distance from robot center to furthest module.
                     new ReplanningConfig() // Default path replanning config. See the API for the options here
             ),
             () -> {
@@ -219,9 +213,9 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void resetOdometry(Pose2d pose) {
-        odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
+        odometer.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), pose);
         //gyro.setGyroAngleZ(pose.getRotation().getDegrees());
-        gyro.setYaw(pose.getRotation().getDegrees());
+        //gyro.setYaw(pose.getRotation().getDegrees());
     }
     public void resetOdometry(){
         resetOdometry(new Pose2d());
@@ -304,7 +298,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
                 new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                        new PIDConstants(4.0, 0.0, 0.0), // Translation PID constants
+                        new PIDConstants(2.0, 0.0, 0.0), // Translation PID constants
                         new PIDConstants(2.0, 0.0, 0.0), // Rotation PID constants
                         0.5, // Max module speed, in m/s
                         0.4, // Drive base radius in meters. Distance from robot center to furthest module.

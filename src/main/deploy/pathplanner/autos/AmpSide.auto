@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3842846515935527,
-      "y": 5.433828157242619
+      "x": 0.7251390307442104,
+      "y": 6.683940204728357
     },
-    "rotation": 0.0
+    "rotation": 59.82647997035565
   },
   "command": {
     "type": "sequential",
@@ -14,7 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Path1"
+            "pathName": "AmpSide1"
           }
         },
         {
@@ -28,15 +28,15 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "Path2"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "AmpSide2"
                 }
               }
             ]
@@ -45,7 +45,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Path3"
+            "pathName": "AmpSide3"
           }
         },
         {

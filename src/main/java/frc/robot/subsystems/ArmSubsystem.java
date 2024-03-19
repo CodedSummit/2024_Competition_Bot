@@ -157,7 +157,7 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
     if(manualPosition() < 30){
       //piece up
       handlerMotorDriveForward();
-    } else if(manualPosition() < 285){
+    } else if(manualPosition() < 219){
       //piece down on front side
       handlerMotorDriveBackward();
     } else {
