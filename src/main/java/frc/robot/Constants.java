@@ -163,7 +163,7 @@ public static final class VisionConstants {
   public static final int kRAmpTagID = 5;
   public static final int kRStageTagID = 11;
   public static final int kRSpeakerTagID = 4;
-  public static long kLogInterval = 500; // logging interval, ms.  Set to 0 to disable logging
+  public static long kLogInterval = 5; // logging interval, ms.  Set to 0 to disable logging
 
 }
 
