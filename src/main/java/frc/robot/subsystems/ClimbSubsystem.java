@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.ShooterConstants;
@@ -56,6 +58,13 @@ private TalonFX m_motor = new TalonFX(ClimbConstants.kClimbCanbusID, "rio");
         .withProperties(Map.of("min", 0, "max", 1))
         .getEntry();
     
+    climbTab.add("Lower", Commands.startEnd(
+      () -> lower(), 
+      () -> stop(), this))
+      .withWidget(BuiltInWidgets.kToggleButton); 
+    climbTab.add("Climb", Commands.startEnd(
+      () -> climb(), 
+      () -> stop(), this)); 
   
   }
 
@@ -92,6 +101,7 @@ private TalonFX m_motor = new TalonFX(ClimbConstants.kClimbCanbusID, "rio");
     m_motor.set(-getClimbSpeed());
   }
 
+  
   public void stop() {
     m_motor.set(0.0);
   }
