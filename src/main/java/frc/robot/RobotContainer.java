@@ -23,6 +23,8 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.counter.UpDownCounter;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -68,6 +70,8 @@ public class RobotContainer {
   private final NoteShooterSubsystem m_shooterSubsystem = new NoteShooterSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   private final ClimbSubsystem m_ClimbSubsystem = new ClimbSubsystem();
+
+  private final PowerDistribution pdp = new PowerDistribution(1, ModuleType.kRev);
 
   private SwerveJoystickCmd swerveJoystickCmd;
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem();
@@ -136,6 +140,9 @@ public class RobotContainer {
     sys.add(m_armSubsystem);
 
     sys.add(ShootCommand());
+
+    sys.add(pdp);
+    
 
   }
 

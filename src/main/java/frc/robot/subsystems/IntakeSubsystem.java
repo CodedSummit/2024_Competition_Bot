@@ -91,9 +91,9 @@ public class IntakeSubsystem extends SubsystemBase {
     m_hasNote = !m_beamSwitch.get();  // assumes switch "true" means the beam is NOT broken (Thus no Note)
   
     if (hasNote()){
-      m_led.setMiddleOrange();
+      m_led.setStripOrange();
     } else {
-      m_led.setMiddleOff();
+      m_led.setStripOff();
     }
   }
 

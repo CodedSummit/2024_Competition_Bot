@@ -65,6 +65,8 @@ public class NoteShooterSubsystem extends SubsystemBase {
         .getEntry();
     shooterTab.addDouble("Angle", () -> getShooterAngle());
 
+    shooterTab.addDouble("Shooter RPM", ()-> m_motor.getVelocity().getValueAsDouble());
+
     shooterTab.addString("Current Command", () -> current_command_name());
   
   }

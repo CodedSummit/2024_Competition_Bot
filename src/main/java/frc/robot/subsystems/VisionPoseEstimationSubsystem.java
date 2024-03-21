@@ -168,9 +168,9 @@ public class VisionPoseEstimationSubsystem extends SubsystemBase {
 
     }
     if(received_vision_update){
-      m_led.setEndsGreen();
+      //m_led.setEndsGreen();
     } else {
-      m_led.setEndsOff();
+      //m_led.setEndsOff();
     }
 
   }
