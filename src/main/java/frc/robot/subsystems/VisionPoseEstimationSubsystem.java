@@ -4,17 +4,24 @@
 
 package frc.robot.subsystems;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -37,25 +44,36 @@ public class VisionPoseEstimationSubsystem extends SubsystemBase {
   private boolean m_visionEnabled = false;
   AddressableLedSubsystem m_led;
   SwerveSubsystem m_SwerveSubsystem;
+   private IntegerLogEntry m_rightLog;
+   private IntegerLogEntry m_leftLog;
+   private IntegerLogEntry m_backLog;
+   private IntegerLogEntry m_targetIds;
+  private long m_lastLogTime = 0;
 
   /** Creates a new VisionPoseEstimationSubsystem. */
   public VisionPoseEstimationSubsystem(AddressableLedSubsystem led) {
-    
+
     m_led = led;
 
     // Construct PhotonPoseEstimators
      m_backCamPhotonPoseEstimator = new PhotonPoseEstimator(m_CompetitionAprilTagFieldLayout, 
       PoseStrategy.AVERAGE_BEST_TARGETS, m_backCamera, VisionConstants.kRobotToBackCam);
-     m_leftCamPhotonPoseEstimator = new PhotonPoseEstimator(m_CompetitionAprilTagFieldLayout, 
-      PoseStrategy.AVERAGE_BEST_TARGETS, m_leftCamera, VisionConstants.kRobotToLeftCam);
-     m_rightCamPhotonPoseEstimator = new PhotonPoseEstimator(m_CompetitionAprilTagFieldLayout, 
-      PoseStrategy.AVERAGE_BEST_TARGETS, m_rightCamera, VisionConstants.kRobotToRightCam);
+    m_leftCamPhotonPoseEstimator = new PhotonPoseEstimator(m_CompetitionAprilTagFieldLayout,
+        PoseStrategy.AVERAGE_BEST_TARGETS, m_leftCamera, VisionConstants.kRobotToLeftCam);
+    m_rightCamPhotonPoseEstimator = new PhotonPoseEstimator(m_CompetitionAprilTagFieldLayout,
+        PoseStrategy.AVERAGE_BEST_TARGETS, m_rightCamera, VisionConstants.kRobotToRightCam);
+    DataLog log = DataLogManager.getLog();
+    m_rightLog = new IntegerLogEntry(log, "RightCamTargets");
+    m_leftLog = new IntegerLogEntry(log, "LeftCamTargets");
+    m_backLog = new IntegerLogEntry(log, "BackCamTargets");
+    m_targetIds = new IntegerLogEntry(log, "TargetIDs");
   }
-
+    
+  
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-
+    logVisionTargets();
   }
 
   public void initialize() {
@@ -68,7 +86,37 @@ public class VisionPoseEstimationSubsystem extends SubsystemBase {
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
   }
-  
+ /**
+  * Log the targets seen by the cameras for later analysis
+  */
+  public void logVisionTargets() {
+    // change to keep a local cache of targets seen, and periodically write them out
+    long t = System.currentTimeMillis();
+    if (VisionConstants.kLogInterval != 0 && (t - m_lastLogTime > VisionConstants.kLogInterval)) {
+      m_lastLogTime = t;
+
+      PhotonPipelineResult result = m_rightCamera.getLatestResult();
+      List<PhotonTrackedTarget> targets = result.getTargets();
+      if (result.hasTargets()) {
+        m_rightLog.append(targets.size());
+        targets.forEach(id -> m_targetIds.append(id.getFiducialId()));
+      }
+      result = m_leftCamera.getLatestResult();
+      targets = result.getTargets();
+      if (result.hasTargets()) {
+        m_leftLog.append(targets.size());
+        targets.forEach(id -> m_targetIds.append(id.getFiducialId()));
+      }
+      result = m_backCamera.getLatestResult();
+      targets = result.getTargets();
+      if (result.hasTargets()) {
+        m_backLog.append(targets.size());
+        targets.forEach(id -> m_targetIds.append(id.getFiducialId()));
+      }
+    }
+  }
+
+
   //  Get the actual estimates from the different cameras (Left (LC), Right (RC), back (BC))
   private Optional<EstimatedRobotPose> getLCEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
       m_leftCamPhotonPoseEstimator.setReferencePose(prevEstimatedRobotPose);

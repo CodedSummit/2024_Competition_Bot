@@ -163,12 +163,13 @@ public static final class VisionConstants {
   public static final int kRAmpTagID = 5;
   public static final int kRStageTagID = 11;
   public static final int kRSpeakerTagID = 4;
+  public static long kLogInterval = 5; // logging interval, ms.  Set to 0 to disable logging
 
 }
 
 public static final class ArmConstants {
   // Various constants for the Arm
-  // TODO - set the real values
+  
   //
   public static final double kMaxArmAngleDeg = 0.0;
   public static final double kMinArmAngleDeg = 0.0;
@@ -195,7 +196,7 @@ public static String kArmHandlerSpeedPrefKey = "Arm.handlerSpeed";
 
 public static final class ShooterConstants {
   // Various constants for the Shooter
-  // TODO - set the real values
+  
 
   public static final int kShooterCanbusID = 7;
   public static double kShooterSpeed = 0.5;
@@ -206,7 +207,7 @@ public static final class ShooterConstants {
 
 public static final class IntakeConstants {
   // Various constants for the Intake subsystem
-  // TODO - set the real values
+ 
 
   public static final int kIntakeCanbusID = 8;
   public static int kIntakeBeambreakID = 8; // digital ID for the beam break switch
