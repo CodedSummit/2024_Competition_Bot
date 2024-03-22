@@ -182,16 +182,29 @@ public class RobotContainer {
       .onFalse(new InstantCommand(() -> swerveJoystickCmd.setFieldOriented(true)));
 
       //reverse robot orientation mode
-      m_drivPs5Controller.axisGreaterThan(3, 0.5)
+      m_drivPs5Controller.axisGreaterThan(3, 0.5).and(m_drivPs5Controller.button(5).negate())
       .onTrue(new InstantCommand(() -> swerveJoystickCmd.setReverseFieldOriented(true)))
       .onFalse(new InstantCommand(() -> swerveJoystickCmd.setReverseFieldOriented(false)));
 
+      m_drivPs5Controller.button(5)
+    /*
+    note: there is an odd state you can get into with the dampen and boost features enabled below. As the press and
+          release are different operations, you can cause odd behaviors. Consider the following sequence:
+        Press bumper(set dampened)
+        Press Trigger(set Turbo)
+        Release Trigger (Set Normal)
+        now, the speed is normal, in spite of still holding the bumper in.
+        this can be resolved by considering the state of both buttons when choosing the speed factor.
+        
+        Fix below may work (also applied above) that allows consideration of other button states when applying the commands.
+     */
 
     m_drivPs5Controller.button(6)
       .onTrue(new InstantCommand(() -> swerveJoystickCmd.setMotionScale(swerveSubsystem.getDampenedSpeedFactor())))
       .onFalse(new InstantCommand(() -> swerveJoystickCmd.setMotionScale(swerveSubsystem.getNormalSpeedFactor())));
 
-    m_drivPs5Controller.axisGreaterThan(4, 0.5)
+    //includes logic to not activate if dampen is pressed.
+      m_drivPs5Controller.axisGreaterThan(4, 0.5).and(m_drivPs5Controller.button(6).negate())
       .onTrue(new InstantCommand(() -> swerveJoystickCmd.setMotionScale(swerveSubsystem.getTurboSpeedFactor())))
       .onFalse(new InstantCommand(() -> swerveJoystickCmd.setMotionScale(swerveSubsystem.getNormalSpeedFactor())));
 
