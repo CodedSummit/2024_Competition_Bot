@@ -101,17 +101,26 @@ public class VisionPoseEstimationSubsystem extends SubsystemBase {
         m_rightLog.append(targets.size());
         targets.forEach(id -> m_targetIds.append(id.getFiducialId()));
       }
+      else {
+        m_rightLog.append(0);
+      }
       result = m_leftCamera.getLatestResult();
       targets = result.getTargets();
       if (result.hasTargets()) {
         m_leftLog.append(targets.size());
         targets.forEach(id -> m_targetIds.append(id.getFiducialId()));
       }
+      else {
+        m_leftLog.append(0);
+      }
       result = m_backCamera.getLatestResult();
       targets = result.getTargets();
       if (result.hasTargets()) {
         m_backLog.append(targets.size());
         targets.forEach(id -> m_targetIds.append(id.getFiducialId()));
+      }
+      else {
+        m_backLog.append(0);
       }
     }
   }
@@ -169,6 +178,7 @@ public class VisionPoseEstimationSubsystem extends SubsystemBase {
     }
     if(received_vision_update){
       //m_led.setEndsGreen();
+
     } else {
       //m_led.setEndsOff();
     }
