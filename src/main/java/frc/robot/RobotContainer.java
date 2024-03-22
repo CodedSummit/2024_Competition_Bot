@@ -186,7 +186,6 @@ public class RobotContainer {
       .onTrue(new InstantCommand(() -> swerveJoystickCmd.setReverseFieldOriented(true)))
       .onFalse(new InstantCommand(() -> swerveJoystickCmd.setReverseFieldOriented(false)));
 
-      m_drivPs5Controller.button(5)
     /*
     note: there is an odd state you can get into with the dampen and boost features enabled below. As the press and
           release are different operations, you can cause odd behaviors. Consider the following sequence:
@@ -195,7 +194,7 @@ public class RobotContainer {
         Release Trigger (Set Normal)
         now, the speed is normal, in spite of still holding the bumper in.
         this can be resolved by considering the state of both buttons when choosing the speed factor.
-        
+
         Fix below may work (also applied above) that allows consideration of other button states when applying the commands.
      */
 
